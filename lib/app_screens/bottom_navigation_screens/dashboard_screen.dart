@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:assignment/app_screens/bottom_navigation_screens/shopping_list_screen.dart';
-import 'package:assignment/app_screens/bottom_navigation_screens/todo_list_screen.dart';
+import 'package:assignment/app_screens/bottom_navigation_screens/form_screen.dart';
+import 'package:assignment/app_screens/bottom_navigation_screens/weight_list_screen.dart';
 import 'package:assignment/res/constantcolors.dart';
 import 'package:assignment/res/strings.dart';
 import 'package:flutter/material.dart';
@@ -37,15 +37,15 @@ class DashBoardScreen extends StatelessWidget {
             ),),
             bottom: const TabBar(
               tabs: <Widget>[
-                Tab(text: 'Shopping List'),
-                Tab(text: 'Todo List'),
+                Tab(text: 'Form'),
+                Tab(text: 'Weight List'),
               ],
             ),
           ),
-          body: const TabBarView(
+          body:  TabBarView(
             children: <Widget>[
-              ShoppingListScreen(),
-              TodoListScreen()
+              FormScreen(),
+             const WeightListScreen()
             ],
           ),
         ),

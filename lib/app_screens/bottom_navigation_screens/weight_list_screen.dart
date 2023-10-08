@@ -1,4 +1,4 @@
-import 'package:assignment/dialogs/dialog_add_shopping.dart';
+import 'package:assignment/dialogs/dialog_edit_weight.dart';
 import 'package:assignment/res/common_widgets/vertical_widget_spacer.dart';
 import 'package:assignment/res/constantcolors.dart';
 import 'package:assignment/res/flutterToast_message.dart';
@@ -10,8 +10,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../res/strings.dart';
 
-class TodoListScreen extends StatelessWidget {
-  const TodoListScreen({super.key});
+class WeightListScreen extends StatelessWidget {
+  const WeightListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class TodoListScreen extends StatelessWidget {
           final sharedPref = ref.watch(sharedPreferencesProvider);
           var userID = sharedPref.value!.getString(Strings.userID);
           return StreamBuilder(
-              stream: FirebaseFirestore.instance.collection("users").doc(userID).collection("items").snapshots(),
+              stream: FirebaseFirestore.instance.collection("users").doc(userID).collection("items").orderBy('time', descending: true).snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
                 if(snapshot.connectionState== ConnectionState.waiting)
                   {
@@ -47,6 +47,7 @@ class TodoListScreen extends StatelessWidget {
                     children: snapshot.data!.docs.map((DocumentSnapshot document) {
                       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
                       // Use data in your UI, for example:
+                      debugPrint("The weight is ${data['weight']}");
                       return Container(
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -57,13 +58,26 @@ class TodoListScreen extends StatelessWidget {
                         ),
                         margin: const EdgeInsets.only(bottom: 16.0),
                         child: ListTile(
-                          title: Text(data['item_name']),
-                          trailing: InkWell(
-                            onTap: (){
-                              getCallDeleteItem(data['id'],userID);
-                            },
-                              child: const Icon(Icons.delete,color: ConstantColors.secondaryColor,)),
-                        ),
+                          title: Text(data['weight'],style: const TextStyle(
+                            color: Colors.black
+                          ),),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              InkWell(
+                                onTap: (){
+                                  getCallEditWeight(context,data['weight'],userID,data['id']);
+                                },
+                                child: const Icon(Icons.edit,color: ConstantColors.secondaryColor),
+                              ),
+                              InkWell(
+                                  onTap: (){
+                                    getCallDeleteItem(data['id'],userID);
+                                  },
+                                  child: const Icon(Icons.delete,color: ConstantColors.secondaryColor,)),
+                            ],
+                          ),
+                        )
                       );
                     }).toList(),
                   );
@@ -72,44 +86,9 @@ class TodoListScreen extends StatelessWidget {
           );
         }),
       ),
-      floatingActionButton:
-      Consumer(builder: (_,WidgetRef ref,__){
-        return FloatingActionButton(onPressed: (){
-          getCallShoppingListItems(context, ref);
-        },
-          backgroundColor: ConstantColors.secondaryColor,
-          child: const Icon(Icons.add,color: Colors.white,),
-        );
-      })
     );
   }
-
-  void getCallShoppingListItems(BuildContext context, WidgetRef ref) {
-    final sharedPref = ref.watch(sharedPreferencesProvider);
-    var userID = sharedPref.value!.getString(Strings.userID);
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return DialogAddShopping();
-        }).then((item) async {
-      if (item != null) {
-        final document = FirebaseFirestore.instance
-            .collection("users")
-            .doc(userID)
-            .collection("items")
-            .doc();
-        await document
-            .set({
-              'id': document.id,
-              'item_name': item,
-            })
-            .then((value) {})
-            .catchError((e) {
-              flutterToastMsg(e.toString());
-            });
-      }
-    });
-  }
+  
 
   void getCallDeleteItem(String id, String? userID) {
     DocumentReference documentReference =
@@ -117,6 +96,30 @@ class TodoListScreen extends StatelessWidget {
 
     documentReference.delete().then((value){
       flutterToastMsg("Item Deleted");
+    });
+  }
+
+  void getCallEditWeight(BuildContext context,String data, String? userID, String id) {
+    showDialog(context: context, builder:
+    (BuildContext context){
+      return DialogEditWeight(weight: data);
+    }).then((value) async {
+      final document = FirebaseFirestore.instance
+          .collection("users")
+          .doc(userID)
+          .collection("items")
+          .doc(id);
+      await document
+          .update({
+        'weight': value,
+        'time': DateTime.now()
+      })
+          .then((value) {
+        flutterToastMsg("Weight Updated");
+      })
+          .catchError((e) {
+        flutterToastMsg(e.toString());
+      });
     });
   }
 }

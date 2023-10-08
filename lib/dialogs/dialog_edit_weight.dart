@@ -5,14 +5,15 @@ import 'package:flutter/material.dart';
 
 import '../res/constantcolors.dart';
 
-class DialogAddShopping extends StatelessWidget with InvalidateMixin{
-  DialogAddShopping({super.key});
-
-  final nameController = TextEditingController();
+class DialogEditWeight extends StatelessWidget with InvalidateMixin{
+  DialogEditWeight( {key, required this.weight}): super(key: key);
+  String weight;
+ TextEditingController? nameController;
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    nameController = TextEditingController(text: weight);
     return AlertDialog(
       // contentPadding: EdgeInsets.zero,
         actions: [
@@ -48,7 +49,7 @@ class DialogAddShopping extends StatelessWidget with InvalidateMixin{
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(Strings.addItem.toUpperCase(),
+                Text(Strings.addWeight.toUpperCase(),
                   style: const TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w600,
@@ -111,7 +112,7 @@ class DialogAddShopping extends StatelessWidget with InvalidateMixin{
   void callPostMethod(BuildContext context) {
     if(_formKey.currentState!.validate())
       {
-        Navigator.of(context).pop(nameController.text);
+        Navigator.of(context).pop(nameController!.text);
       }
   }
 }

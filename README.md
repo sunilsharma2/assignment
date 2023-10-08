@@ -1,6 +1,6 @@
 # assignment
 
-A new Flutter project from ppn solutions.
+A new Flutter project from Growth natives.
 
 ## Getting Started
 

@@ -24,7 +24,7 @@ class Strings
   //sharedPreference
 static const String userID="UserID";
 
-  static const String addItem="Add Item";
+  static const String addWeight="Add Weight";
 
   static const String submitButtonText="Submit";
 
